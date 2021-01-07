@@ -1,7 +1,7 @@
-class Braw {
+class Gws {
     constructor() {
         
     }
 }
 
-export default Braw
+export default Gws

@@ -1,7 +1,7 @@
 // import Braw from './braw'
-class Braw {
+class Gws {
     constructor() {
         
     }
 }
-window.Braw = Braw
+window.Braw = Gws
