@@ -1,7 +1,9 @@
-// import Braw from './braw'
 class Gws {
-    constructor() {
-        
+    constructor(height, width) {
+      this.height = height;
+      this.width = width;
     }
-}
-window.Braw = Gws
+  }
+
+const a = new Gws()
+console.log(a)

@@ -15,5 +15,15 @@
   "bugs": {
     "url": "https://github.com/lylong93/graw.js/issues"
   },
-  "homepage": "https://github.com/lylong93/graw.js#readme"
+  "homepage": "https://github.com/lylong93/graw.js#readme",
+  "dependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "babel-core": "^6.26.3",
+    "rollup-plugin-babel": "3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-serve": "^1.1.0",
+    "rollup-plugin-uglify": "^6.0.4"
+  }
 }
