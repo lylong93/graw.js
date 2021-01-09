@@ -1,9 +1,3 @@
-class Gws {
-    constructor(height, width) {
-      this.height = height;
-      this.width = width;
-    }
-  }
+import Gws from './gws'
 
-const a = new Gws()
-console.log(a)
+window.Gws = Gws

@@ -1,6 +1,6 @@
 import serve from 'rollup-plugin-serve';
 import babel from 'rollup-plugin-babel';
-import {uglify} from 'rollup-plugin-uglify';
+// import {uglify} from 'rollup-plugin-uglify';
 import livereload from 'rollup-plugin-livereload';
 import commonjs from 'rollup-plugin-commonjs';
 export default {
@@ -8,8 +8,8 @@ export default {
     input: 'src/index.js',
     output: {
         file: 'bundle.js',
-        format: 'umd',
-        sourcemap: true
+        format: 'iife',
+        // sourcemap: true
       },
       plugins: [
         babel({
@@ -17,14 +17,14 @@ export default {
         }),
         commonjs(),
         // 压缩代码
-        uglify(),
+        // uglify(),
         // 热更新 默认监听根文件夹
         livereload(),
         // 本地服务器
         serve({
           open: true, // 自动打开页面
           port: 8000, 
-          openPage: '/public/index.html', // 打开的页面
+          openPage: '/dev/index.html', // 打开的页面
           contentBase: ''
         })
       ]

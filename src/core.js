@@ -1,8 +1,9 @@
 /**
  *  parse html to object
  */
-const htmlParse = () => {
-
+const htmlParse = (root) => {
+    console.log(root)
+    return '123'
 }
 
-export default htmlParse
+export  {htmlParse}

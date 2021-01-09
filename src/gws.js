@@ -1,14 +1,18 @@
-import core from './core'
+import {htmlParse} from './core'
 import wgl from './wgl'
 /**
  * main gws class
  */
 class Gws {
-    constructor(obj,config) {
-        this.obj = obj 
+    constructor(config) {
         this.config = config
+        this.init()
     }
-    //转化
+    init() {
+        const {el} = this.config
+        const root = document.getElementById(el)
+        let three = htmlParse(root)
+    }
 }
 
 export default Gws
