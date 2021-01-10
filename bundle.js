@@ -1,7 +1,11 @@
 
 (function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(window.document);
-(function () {
+(function (acorn) {
   'use strict';
+
+  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+  var acorn__default = /*#__PURE__*/_interopDefaultLegacy(acorn);
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -28,8 +32,11 @@
   /**
    *  parse html to object
    */
+
   var htmlParse = function htmlParse(root) {
-    console.log(root);
+    console.log('acorn', acorn__default['default']); // const parse = acorn.parse('var x = 42; // answer')
+    // console.log(parse)
+
     return '123';
   };
 
@@ -50,7 +57,7 @@
       value: function init() {
         var el = this.config.el;
         var root = document.getElementById(el);
-        var three = htmlParse(root);
+        var three = htmlParse();
       }
     }]);
 
@@ -59,4 +66,4 @@
 
   window.Gws = Gws;
 
-}());
+}(acorn));
