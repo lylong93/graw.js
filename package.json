@@ -23,11 +23,15 @@
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-json": "^2.3.0",
-    "rollup-plugin-node-resolve": "^3.0.0"
+    "rollup-plugin-node-resolve": "^5.2.0"
   },
   "dependencies": {
     "acorn": "^8.0.4",
+    "lodash": "^4.17.20",
     "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-serve": "^1.1.0"
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "rollup-plugin-serve": "^1.1.0",
+    "three": "^0.124.0",
+    "three-orbitcontrols": "^2.110.3"
   }
 }
