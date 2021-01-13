@@ -108,10 +108,13 @@ const wgl = () => {
         renderer.render(scene, camera);
     }
     animate()
-
 }
 
 const creat  =() => {
+    //w width
+    //l long
+    //h height
+
     const box1 = {
         geol:1,
         geow:1,
@@ -122,9 +125,6 @@ const creat  =() => {
         z:-4.5,
     }
 
-    //w width
-    //l long
-    //h height
     const box2 = {
         geol:2,
         geow:2,
@@ -141,7 +141,7 @@ const creat  =() => {
     const material = new THREE.MeshNormalMaterial();
     const group = new THREE.Group();
     arr.forEach(item=> {
-        let {geow,geol,geoh,l,w,h,x,y,z} = item
+        let {geow,geol,geoh,x,y,z} = item
         const topgeometry = new THREE.BoxGeometry(geow,geoh,geol);
         const top = new THREE.Mesh(topgeometry, material);
         top.position.set(x, y, z);

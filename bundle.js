@@ -48792,6 +48792,9 @@
   };
 
   var creat = function creat() {
+    //w width
+    //l long
+    //h height
     var box1 = {
       geol: 1,
       geow: 1,
@@ -48799,10 +48802,7 @@
       x: -4.5,
       y: 0.1,
       z: -4.5
-    }; //w width
-    //l long
-    //h height
-
+    };
     var box2 = {
       geol: 2,
       geow: 2,
@@ -48818,9 +48818,6 @@
       var geow = item.geow,
           geol = item.geol,
           geoh = item.geoh,
-          l = item.l,
-          w = item.w,
-          h = item.h,
           x = item.x,
           y = item.y,
           z = item.z;
