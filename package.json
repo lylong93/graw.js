@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "acorn": "^8.0.4",
+    "dat.gui": "^0.7.7",
     "lodash": "^4.17.20",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-node-polyfills": "^0.2.1",
