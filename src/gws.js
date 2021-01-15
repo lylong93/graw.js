@@ -18,7 +18,6 @@ class Gws {
         }else {
             let three = htmlParse(root)
         }
-        
     }
     create() {
         wgl()

@@ -7,7 +7,6 @@ import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 const wgl = () => {
-
     const scene = new THREE.Scene();
 
     scene.rotation.set(0.5,0,0)
@@ -137,7 +136,6 @@ const creat  =() => {
 
     const arr = [box1,box2]
 
-   
     const material = new THREE.MeshNormalMaterial();
     const group = new THREE.Group();
     arr.forEach(item=> {
