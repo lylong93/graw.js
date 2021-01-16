@@ -3,7 +3,7 @@
  */
 
 // import  acorn from "acorn"
-
+import {g$} from './unit'
 //递归
 const tree =[]
 const recursion = (root) => {
@@ -24,6 +24,8 @@ const htmlParse = (root) => {
     return '123'
 }
 // 获取dom属性
-const getDomProperty=()=>{}
+const getDomProperty=(el)=>{
+    const {offsetLeft,offsetWidth} = g$(el)
+}
 
 export  {htmlParse}
