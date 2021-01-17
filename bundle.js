@@ -27,18 +27,46 @@
     return Constructor;
   }
 
+  // const unit = null
+  // mini $ 
+  var Gj = /*#__PURE__*/function () {
+    function Gj(config) {
+      _classCallCheck(this, Gj);
+
+      this.config = config;
+    }
+
+    _createClass(Gj, [{
+      key: "offsetWidth",
+      value: function offsetWidth() {}
+    }, {
+      key: "offsetLeft",
+      value: function offsetLeft() {}
+    }]);
+
+    return Gj;
+  }();
+
+  var g$ = function g$(el) {
+    var $ = document.querySelector(el);
+    var q = new Gj('el');
+    console.log('q', q);
+    return $;
+  };
+
+  g$('ee');
+   // export default unit
+
   /**
    *  parse html to object
    */
-  // import  acorn from "acorn"
-  //递归
+
   var tree = [];
 
   var recursion = function recursion(root) {
     tree.push(root);
 
     if (root.children) {
-      // console.log(root.children)
       Array.from(root.children).forEach(function (element) {
         recursion(element);
       });
@@ -48,13 +76,19 @@
   var htmlParse = function htmlParse(root) {
     recursion(root);
     tree.map(function (item) {
+      getDomProperty();
       console.log('offsetLeft', item.offsetLeft);
-      console.log('offsetWidth', item.offsetWidth); // console.log(window.getComputedStyle(item).getPropertyValue("width"))
+      console.log('offsetWidth', item.offsetWidth);
     });
     return '123';
-  };
+  }; // 获取dom属性
 
-  console.log('tree', tree);
+
+  var getDomProperty = function getDomProperty(el) {
+    var _g$ = g$(el),
+        offsetLeft = _g$.offsetLeft,
+        offsetWidth = _g$.offsetWidth;
+  };
 
   // threejs.org/license
   const REVISION = '124';
