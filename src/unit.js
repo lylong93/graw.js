@@ -1,8 +1,8 @@
 // const unit = null
 // mini $ 
 class Gj {
-    constructor(config) {
-        this.config = config
+    constructor(eldom) {
+        this.el = document.querySelector(eldom)
     }
     offsetWidth () {
 
@@ -12,13 +12,9 @@ class Gj {
     }
 }
 const g$ = (el) => {
-    const $ = document.querySelector(el)
-
-    const q = new Gj('el')
-    console.log('q',q)
+    const $ = new Gj(el)
     return $
 }
 
-g$('ee')
 export {g$}
 // export default unit

@@ -10,6 +10,9 @@ const wgl = () => {
     const scene = new THREE.Scene();
 
     scene.rotation.set(0.5,0,0)
+    scene.background = new THREE.Color( 0xcce0ff );
+	scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
+
     scene.add(new THREE.AmbientLight(0x505050));
     //light
     const spotLight = new THREE.SpotLight(0xffffff);

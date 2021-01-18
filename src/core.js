@@ -14,6 +14,12 @@ const recursion = (root) => {
         });
     }
 }
+// 获取dom属性
+const getDomProperty=(el)=>{
+    const ddel = g$(el)
+    console.log('el',ddel)
+}
+
 const htmlParse = (root) => {
     recursion(root)
     tree.map(item => {
@@ -23,9 +29,6 @@ const htmlParse = (root) => {
     })
     return '123'
 }
-// 获取dom属性
-const getDomProperty=(el)=>{
-    const {offsetLeft,offsetWidth} = g$(el)
-}
+
 
 export  {htmlParse}

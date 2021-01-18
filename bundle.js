@@ -30,10 +30,10 @@
   // const unit = null
   // mini $ 
   var Gj = /*#__PURE__*/function () {
-    function Gj(config) {
+    function Gj(eldom) {
       _classCallCheck(this, Gj);
 
-      this.config = config;
+      this.el = document.querySelector(eldom);
     }
 
     _createClass(Gj, [{
@@ -48,13 +48,9 @@
   }();
 
   var g$ = function g$(el) {
-    var $ = document.querySelector(el);
-    var q = new Gj('el');
-    console.log('q', q);
+    var $ = new Gj(el);
     return $;
   };
-
-  g$('ee');
    // export default unit
 
   /**
@@ -71,6 +67,12 @@
         recursion(element);
       });
     }
+  }; // 获取dom属性
+
+
+  var getDomProperty = function getDomProperty(el) {
+    var ddel = g$(el);
+    console.log('el', ddel);
   };
 
   var htmlParse = function htmlParse(root) {
@@ -81,13 +83,6 @@
       console.log('offsetWidth', item.offsetWidth);
     });
     return '123';
-  }; // 获取dom属性
-
-
-  var getDomProperty = function getDomProperty(el) {
-    var _g$ = g$(el),
-        offsetLeft = _g$.offsetLeft,
-        offsetWidth = _g$.offsetWidth;
   };
 
   // threejs.org/license
@@ -25345,6 +25340,40 @@
 
   } );
 
+  class Fog {
+
+  	constructor( color, near, far ) {
+
+  		Object.defineProperty( this, 'isFog', { value: true } );
+
+  		this.name = '';
+
+  		this.color = new Color( color );
+
+  		this.near = ( near !== undefined ) ? near : 1;
+  		this.far = ( far !== undefined ) ? far : 1000;
+
+  	}
+
+  	clone() {
+
+  		return new Fog( this.color, this.near, this.far );
+
+  	}
+
+  	toJSON( /* meta */ ) {
+
+  		return {
+  			type: 'Fog',
+  			color: this.color.getHex(),
+  			near: this.near,
+  			far: this.far
+  		};
+
+  	}
+
+  }
+
   class Scene extends Object3D {
 
   	constructor() {
@@ -48733,6 +48762,8 @@
   var wgl = function wgl() {
     var scene = new Scene();
     scene.rotation.set(0.5, 0, 0);
+    scene.background = new Color(0xcce0ff);
+    scene.fog = new Fog(0xcce0ff, 500, 10000);
     scene.add(new AmbientLight(0x505050)); //light
 
     var spotLight = new SpotLight(0xffffff);
