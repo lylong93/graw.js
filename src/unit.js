@@ -10,10 +10,12 @@ class Gj {
     offsetLeft() {
 
     }
+    getText() {
+
+    }
 }
 const g$ = (el) => {
-    const $ = new Gj(el)
-    return $
+    return new Gj(el)
 }
 
 export {g$}
