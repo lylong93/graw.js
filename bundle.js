@@ -42,14 +42,16 @@
     }, {
       key: "offsetLeft",
       value: function offsetLeft() {}
+    }, {
+      key: "getText",
+      value: function getText() {}
     }]);
 
     return Gj;
   }();
 
   var g$ = function g$(el) {
-    var $ = new Gj(el);
-    return $;
+    return new Gj(el);
   };
    // export default unit
 
