@@ -13,6 +13,9 @@ class Gj {
     getText() {
 
     }
+    text() {
+        
+    }
 }
 const g$ = (el) => {
     return new Gj(el)

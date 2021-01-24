@@ -6,6 +6,9 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+/**
+ * 
+ */
 const wgl = () => {
     const scene = new THREE.Scene();
 
@@ -55,28 +58,6 @@ const wgl = () => {
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-
-    // const geometry = new THREE.BoxGeometry(10,0.2,1);
-    // const material1 = new THREE.MeshNormalMaterial({ color: 0x00ff00 });
-    // const material = new THREE.MeshNormalMaterial();
-    // const material3 = new THREE.MeshBasicMaterial({ color: 0x99CCFF });
-
-    // const cube1 = new THREE.Mesh(geometry, material1);
-    // cube1.position.set(-2, 0, 0);
-
-    // const cube3 = new THREE.Mesh(geometry, material3);
-    // cube3.position.set(2, 0, 0);
-
-    // const cube2 = new THREE.Mesh(geometry, material);
-    // cube2.position.set(0, 0, -4.5);
-
-    // const topgeometry = new THREE.BoxGeometry(1,0.2,1);
-    // const top = new THREE.Mesh(topgeometry, material);
-    // top.position.set(-4.5, 0.1, -4.5);
-
-    // const group = new THREE.Group();
-    // group.add(cube2);
-    // group.add(top);
 
     let group = creat()
     // group.add(cube1);
