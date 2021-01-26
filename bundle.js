@@ -25345,40 +25345,6 @@
 
   } );
 
-  class Fog {
-
-  	constructor( color, near, far ) {
-
-  		Object.defineProperty( this, 'isFog', { value: true } );
-
-  		this.name = '';
-
-  		this.color = new Color( color );
-
-  		this.near = ( near !== undefined ) ? near : 1;
-  		this.far = ( far !== undefined ) ? far : 1000;
-
-  	}
-
-  	clone() {
-
-  		return new Fog( this.color, this.near, this.far );
-
-  	}
-
-  	toJSON( /* meta */ ) {
-
-  		return {
-  			type: 'Fog',
-  			color: this.color.getHex(),
-  			near: this.near,
-  			far: this.far
-  		};
-
-  	}
-
-  }
-
   class Scene extends Object3D {
 
   	constructor() {
@@ -31070,6 +31036,92 @@
   	}
 
   	return data;
+
+  }
+
+  /**
+   * Text = 3D Text
+   *
+   * parameters = {
+   *  font: <THREE.Font>, // font
+   *
+   *  size: <float>, // size of the text
+   *  height: <float>, // thickness to extrude text
+   *  curveSegments: <int>, // number of points on the curves
+   *
+   *  bevelEnabled: <bool>, // turn on bevel
+   *  bevelThickness: <float>, // how deep into text bevel goes
+   *  bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
+   *  bevelOffset: <float> // how far from text outline does bevel start
+   * }
+   */
+
+  class TextBufferGeometry extends ExtrudeBufferGeometry {
+
+  	constructor( text, parameters = {} ) {
+
+  		const font = parameters.font;
+
+  		if ( ! ( font && font.isFont ) ) {
+
+  			console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
+  			return new BufferGeometry();
+
+  		}
+
+  		const shapes = font.generateShapes( text, parameters.size );
+
+  		// translate parameters to ExtrudeGeometry API
+
+  		parameters.depth = parameters.height !== undefined ? parameters.height : 50;
+
+  		// defaults
+
+  		if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
+  		if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
+  		if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+
+  		super( shapes, parameters );
+
+  		this.type = 'TextBufferGeometry';
+
+  	}
+
+  }
+
+  /**
+   * Text = 3D Text
+   *
+   * parameters = {
+   *  font: <THREE.Font>, // font
+   *
+   *  size: <float>, // size of the text
+   *  height: <float>, // thickness to extrude text
+   *  curveSegments: <int>, // number of points on the curves
+   *
+   *  bevelEnabled: <bool>, // turn on bevel
+   *  bevelThickness: <float>, // how deep into text bevel goes
+   *  bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
+   *  bevelOffset: <float> // how far from text outline does bevel start
+   * }
+   */
+
+  class TextGeometry extends Geometry {
+
+  	constructor( text, parameters ) {
+
+  		super();
+  		this.type = 'TextGeometry';
+
+  		this.parameters = {
+  			text: text,
+  			parameters: parameters
+  		};
+
+  		this.fromBufferGeometry( new TextBufferGeometry( text, parameters ) );
+  		this.mergeVertices();
+
+  	}
 
   }
 
@@ -39807,6 +39859,45 @@
 
   }
 
+  class AudioAnalyser {
+
+  	constructor( audio, fftSize = 2048 ) {
+
+  		this.analyser = audio.context.createAnalyser();
+  		this.analyser.fftSize = fftSize;
+
+  		this.data = new Uint8Array( this.analyser.frequencyBinCount );
+
+  		audio.getOutput().connect( this.analyser );
+
+  	}
+
+
+  	getFrequencyData() {
+
+  		this.analyser.getByteFrequencyData( this.data );
+
+  		return this.data;
+
+  	}
+
+  	getAverageFrequency() {
+
+  		let value = 0;
+  		const data = this.getFrequencyData();
+
+  		for ( let i = 0; i < data.length; i ++ ) {
+
+  			value += data[ i ];
+
+  		}
+
+  		return value / data.length;
+
+  	}
+
+  }
+
   function PropertyMixer( binding, typeName, valueSize ) {
 
   	this.binding = binding;
@@ -43211,6 +43302,145 @@
 
   }
 
+  const _startP = /*@__PURE__*/ new Vector3();
+  const _startEnd = /*@__PURE__*/ new Vector3();
+
+  class Line3 {
+
+  	constructor( start, end ) {
+
+  		this.start = ( start !== undefined ) ? start : new Vector3();
+  		this.end = ( end !== undefined ) ? end : new Vector3();
+
+  	}
+
+  	set( start, end ) {
+
+  		this.start.copy( start );
+  		this.end.copy( end );
+
+  		return this;
+
+  	}
+
+  	clone() {
+
+  		return new this.constructor().copy( this );
+
+  	}
+
+  	copy( line ) {
+
+  		this.start.copy( line.start );
+  		this.end.copy( line.end );
+
+  		return this;
+
+  	}
+
+  	getCenter( target ) {
+
+  		if ( target === undefined ) {
+
+  			console.warn( 'THREE.Line3: .getCenter() target is now required' );
+  			target = new Vector3();
+
+  		}
+
+  		return target.addVectors( this.start, this.end ).multiplyScalar( 0.5 );
+
+  	}
+
+  	delta( target ) {
+
+  		if ( target === undefined ) {
+
+  			console.warn( 'THREE.Line3: .delta() target is now required' );
+  			target = new Vector3();
+
+  		}
+
+  		return target.subVectors( this.end, this.start );
+
+  	}
+
+  	distanceSq() {
+
+  		return this.start.distanceToSquared( this.end );
+
+  	}
+
+  	distance() {
+
+  		return this.start.distanceTo( this.end );
+
+  	}
+
+  	at( t, target ) {
+
+  		if ( target === undefined ) {
+
+  			console.warn( 'THREE.Line3: .at() target is now required' );
+  			target = new Vector3();
+
+  		}
+
+  		return this.delta( target ).multiplyScalar( t ).add( this.start );
+
+  	}
+
+  	closestPointToPointParameter( point, clampToLine ) {
+
+  		_startP.subVectors( point, this.start );
+  		_startEnd.subVectors( this.end, this.start );
+
+  		const startEnd2 = _startEnd.dot( _startEnd );
+  		const startEnd_startP = _startEnd.dot( _startP );
+
+  		let t = startEnd_startP / startEnd2;
+
+  		if ( clampToLine ) {
+
+  			t = MathUtils.clamp( t, 0, 1 );
+
+  		}
+
+  		return t;
+
+  	}
+
+  	closestPointToPoint( point, clampToLine, target ) {
+
+  		const t = this.closestPointToPointParameter( point, clampToLine );
+
+  		if ( target === undefined ) {
+
+  			console.warn( 'THREE.Line3: .closestPointToPoint() target is now required' );
+  			target = new Vector3();
+
+  		}
+
+  		return this.delta( target ).multiplyScalar( t ).add( this.start );
+
+  	}
+
+  	applyMatrix4( matrix ) {
+
+  		this.start.applyMatrix4( matrix );
+  		this.end.applyMatrix4( matrix );
+
+  		return this;
+
+  	}
+
+  	equals( line ) {
+
+  		return line.start.equals( this.start ) && line.end.equals( this.end );
+
+  	}
+
+  }
+
   function ImmediateRenderObject( material ) {
 
   	Object3D.call( this );
@@ -43236,6 +43466,236 @@
   ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
 
   ImmediateRenderObject.prototype.isImmediateRenderObject = true;
+
+  const _vector$a = /*@__PURE__*/ new Vector3();
+  const _boneMatrix = /*@__PURE__*/ new Matrix4();
+  const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
+
+
+  class SkeletonHelper extends LineSegments {
+
+  	constructor( object ) {
+
+  		const bones = getBoneList( object );
+
+  		const geometry = new BufferGeometry();
+
+  		const vertices = [];
+  		const colors = [];
+
+  		const color1 = new Color( 0, 0, 1 );
+  		const color2 = new Color( 0, 1, 0 );
+
+  		for ( let i = 0; i < bones.length; i ++ ) {
+
+  			const bone = bones[ i ];
+
+  			if ( bone.parent && bone.parent.isBone ) {
+
+  				vertices.push( 0, 0, 0 );
+  				vertices.push( 0, 0, 0 );
+  				colors.push( color1.r, color1.g, color1.b );
+  				colors.push( color2.r, color2.g, color2.b );
+
+  			}
+
+  		}
+
+  		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+  		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+
+  		const material = new LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false, toneMapped: false, transparent: true } );
+
+  		super( geometry, material );
+
+  		this.type = 'SkeletonHelper';
+  		this.isSkeletonHelper = true;
+
+  		this.root = object;
+  		this.bones = bones;
+
+  		this.matrix = object.matrixWorld;
+  		this.matrixAutoUpdate = false;
+
+  	}
+
+  	updateMatrixWorld( force ) {
+
+  		const bones = this.bones;
+
+  		const geometry = this.geometry;
+  		const position = geometry.getAttribute( 'position' );
+
+  		_matrixWorldInv.copy( this.root.matrixWorld ).invert();
+
+  		for ( let i = 0, j = 0; i < bones.length; i ++ ) {
+
+  			const bone = bones[ i ];
+
+  			if ( bone.parent && bone.parent.isBone ) {
+
+  				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
+  				_vector$a.setFromMatrixPosition( _boneMatrix );
+  				position.setXYZ( j, _vector$a.x, _vector$a.y, _vector$a.z );
+
+  				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
+  				_vector$a.setFromMatrixPosition( _boneMatrix );
+  				position.setXYZ( j + 1, _vector$a.x, _vector$a.y, _vector$a.z );
+
+  				j += 2;
+
+  			}
+
+  		}
+
+  		geometry.getAttribute( 'position' ).needsUpdate = true;
+
+  		super.updateMatrixWorld( force );
+
+  	}
+
+  }
+
+
+  function getBoneList( object ) {
+
+  	const boneList = [];
+
+  	if ( object && object.isBone ) {
+
+  		boneList.push( object );
+
+  	}
+
+  	for ( let i = 0; i < object.children.length; i ++ ) {
+
+  		boneList.push.apply( boneList, getBoneList( object.children[ i ] ) );
+
+  	}
+
+  	return boneList;
+
+  }
+
+  class GridHelper extends LineSegments {
+
+  	constructor( size = 10, divisions = 10, color1 = 0x444444, color2 = 0x888888 ) {
+
+  		color1 = new Color( color1 );
+  		color2 = new Color( color2 );
+
+  		const center = divisions / 2;
+  		const step = size / divisions;
+  		const halfSize = size / 2;
+
+  		const vertices = [], colors = [];
+
+  		for ( let i = 0, j = 0, k = - halfSize; i <= divisions; i ++, k += step ) {
+
+  			vertices.push( - halfSize, 0, k, halfSize, 0, k );
+  			vertices.push( k, 0, - halfSize, k, 0, halfSize );
+
+  			const color = i === center ? color1 : color2;
+
+  			color.toArray( colors, j ); j += 3;
+  			color.toArray( colors, j ); j += 3;
+  			color.toArray( colors, j ); j += 3;
+  			color.toArray( colors, j ); j += 3;
+
+  		}
+
+  		const geometry = new BufferGeometry();
+  		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+  		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+
+  		const material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
+
+  		super( geometry, material );
+
+  		this.type = 'GridHelper';
+
+  	}
+
+  }
+
+  const _v1$6 = /*@__PURE__*/ new Vector3();
+  const _v2$3 = /*@__PURE__*/ new Vector3();
+  const _v3$1 = /*@__PURE__*/ new Vector3();
+
+  class DirectionalLightHelper extends Object3D {
+
+  	constructor( light, size, color ) {
+
+  		super();
+  		this.light = light;
+  		this.light.updateMatrixWorld();
+
+  		this.matrix = light.matrixWorld;
+  		this.matrixAutoUpdate = false;
+
+  		this.color = color;
+
+  		if ( size === undefined ) size = 1;
+
+  		let geometry = new BufferGeometry();
+  		geometry.setAttribute( 'position', new Float32BufferAttribute( [
+  			- size, size, 0,
+  			size, size, 0,
+  			size, - size, 0,
+  			- size, - size, 0,
+  			- size, size, 0
+  		], 3 ) );
+
+  		const material = new LineBasicMaterial( { fog: false, toneMapped: false } );
+
+  		this.lightPlane = new Line( geometry, material );
+  		this.add( this.lightPlane );
+
+  		geometry = new BufferGeometry();
+  		geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
+
+  		this.targetLine = new Line( geometry, material );
+  		this.add( this.targetLine );
+
+  		this.update();
+
+  	}
+
+  	dispose() {
+
+  		this.lightPlane.geometry.dispose();
+  		this.lightPlane.material.dispose();
+  		this.targetLine.geometry.dispose();
+  		this.targetLine.material.dispose();
+
+  	}
+
+  	update() {
+
+  		_v1$6.setFromMatrixPosition( this.light.matrixWorld );
+  		_v2$3.setFromMatrixPosition( this.light.target.matrixWorld );
+  		_v3$1.subVectors( _v2$3, _v1$6 );
+
+  		this.lightPlane.lookAt( _v2$3 );
+
+  		if ( this.color !== undefined ) {
+
+  			this.lightPlane.material.color.set( this.color );
+  			this.targetLine.material.color.set( this.color );
+
+  		} else {
+
+  			this.lightPlane.material.color.copy( this.light.color );
+  			this.targetLine.material.color.copy( this.light.color );
+
+  		}
+
+  		this.targetLine.lookAt( _v2$3 );
+  		this.targetLine.scale.z = _v3$1.length();
+
+  	}
+
+  }
 
   //
 
@@ -43341,6 +43801,18 @@
   	}
 
   } );
+
+  GridHelper.prototype.setColors = function () {
+
+  	console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
+
+  };
+
+  SkeletonHelper.prototype.update = function () {
+
+  	console.error( 'THREE.SkeletonHelper: update() no longer needs to be called.' );
+
+  };
 
   //
 
@@ -43450,6 +43922,13 @@
 
   	console.warn( 'THREE.Frustum: .setFromMatrix() has been renamed to .setFromProjectionMatrix().' );
   	return this.setFromProjectionMatrix( m );
+
+  };
+
+  Line3.prototype.center = function ( optionalTarget ) {
+
+  	console.warn( 'THREE.Line3: .center() has been renamed to .getCenter().' );
+  	return this.getCenter( optionalTarget );
 
   };
 
@@ -45001,6 +45480,13 @@
   	}
 
   } );
+
+  AudioAnalyser.prototype.getData = function () {
+
+  	console.warn( 'THREE.AudioAnalyser: .getData() is now .getFrequencyData().' );
+  	return this.getFrequencyData();
+
+  };
 
   //
 
@@ -47566,6 +48052,7 @@
     });
   }
   var GUI$1 = GUI;
+  //# sourceMappingURL=dat.gui.module.js.map
 
   // This set of controls performs orbiting, dollying (zooming), and panning.
   // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -48768,36 +49255,46 @@
    */
 
   var wgl = function wgl() {
+    var _createBasis = createBasis(),
+        scene = _createBasis.scene,
+        camera = _createBasis.camera,
+        renderer = _createBasis.renderer;
+
+    createFloor(scene); // createLight(scene)
+
+    createGeo(scene);
+    createFont(scene);
+    createTextur(scene);
+
+    var _createLight = createLight(scene);
+
+    createTool(scene, camera, renderer);
+    init(scene, camera, renderer);
+  };
+
+  var createBasis = function createBasis() {
+    //scene
     var scene = new Scene();
-    scene.rotation.set(0.5, 0, 0);
-    scene.background = new Color(0xcce0ff);
-    scene.fog = new Fog(0xcce0ff, 500, 10000);
-    scene.add(new AmbientLight(0x505050)); //light
+    scene.rotation.set(-0.7, 0, 0); // scene.background = new THREE.Color(0xcce0ff);
+    // scene.fog = new THREE.Fog(0xcce0ff, 500, 10000);
+    // scene.add(new THREE.AmbientLight(0x505050));
+    //camera
 
-    var spotLight = new SpotLight(0xffffff);
-    spotLight.angle = Math.PI / 5;
-    spotLight.penumbra = 0.2;
-    spotLight.position.set(2, 3, 3);
-    spotLight.castShadow = true;
-    spotLight.shadow.camera.near = 3;
-    spotLight.shadow.camera.far = 10;
-    spotLight.shadow.mapSize.width = 1024;
-    spotLight.shadow.mapSize.height = 1024;
-    scene.add(spotLight); //dirLight
+    var camera = new PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.25, 25);
+    camera.position.set(0, 0, 20); //renderer
 
-    var dirLight = new DirectionalLight(0x55505a, 1);
-    dirLight.position.set(0, 3, 0);
-    dirLight.castShadow = true;
-    dirLight.shadow.camera.near = 1;
-    dirLight.shadow.camera.far = 10;
-    dirLight.shadow.camera.right = 1;
-    dirLight.shadow.camera.left = -1;
-    dirLight.shadow.camera.top = 1;
-    dirLight.shadow.camera.bottom = -1;
-    dirLight.shadow.mapSize.width = 1024;
-    dirLight.shadow.mapSize.height = 1024;
-    scene.add(dirLight); //floor
+    var renderer = new WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+    return {
+      scene: scene,
+      camera: camera,
+      renderer: renderer
+    };
+  };
 
+  var createFloor = function createFloor(scene) {
     var floorMat = new MeshStandardMaterial({
       roughness: 0.8,
       color: 0xffffff,
@@ -48805,23 +49302,222 @@
       bumpScale: 0.0005
     }); //floor
 
-    var floorGeometry = new PlaneBufferGeometry(10, 10);
+    var floorGeometry = new PlaneBufferGeometry(11, 10);
     var floorMesh = new Mesh(floorGeometry, floorMat);
-    floorMesh.receiveShadow = true;
-    floorMesh.rotation.x = -Math.PI / 2.0;
+    floorMesh.receiveShadow = true; // floorMesh.rotation.x = -Math.PI / 2.0;
+
     scene.add(floorMesh);
-    var renderer = new WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-    var group = creat(); // group.add(cube1);
-    // group.add(cube3);
+  };
 
-    scene.add(group); //camera
+  var createLight = function createLight(scene) {
+    //light
+    var spotLight = new PointLight(0xffffff, 5);
+    spotLight.position.set(0, 10, 1); // spotLight.castShadow = true;
+    // scene.add(spotLight);
+    //dirLight
 
-    var camera = new PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.25, 16);
-    camera.position.set(0, 1.3, 10);
-    scene.position.z = 1; //controls
+    var dirLight = new DirectionalLight(0xffffff, 10);
+    dirLight.position.set(0, 0, 3);
+    dirLight.castShadow = true; // dirLight.shadow.camera.near = 1;
+    // dirLight.shadow.camera.far = 10;
+    // dirLight.shadow.camera.right = 1;
+    // dirLight.shadow.camera.left = -1;
+    // dirLight.shadow.camera.top = 1;
+    // dirLight.shadow.camera.bottom = -1;
+    // dirLight.shadow.mapSize.width = 1024;
+    // dirLight.shadow.mapSize.height = 1024;
 
+    var helper = new DirectionalLightHelper(dirLight, 2, '#ff0000');
+    scene.add(helper);
+    scene.add(dirLight);
+    return {
+      dirLight: dirLight
+    };
+  };
+
+  var createGeo = function createGeo(scene) {
+    var arr = [{
+      geol: 0.5,
+      geow: 0.5,
+      geoh: 11,
+      x: -5.2,
+      y: 0,
+      z: 0
+    }, {
+      geol: 0.5,
+      geow: 0.5,
+      geoh: 11,
+      x: 5.2,
+      y: 0,
+      z: 0
+    }, {
+      geol: 0.5,
+      geow: 10,
+      geoh: 1,
+      x: 0,
+      y: 5,
+      z: 0
+    }, {
+      geol: 0.5,
+      geow: 10,
+      geoh: 0.5,
+      x: 0,
+      y: 1,
+      z: 0
+    }, {
+      geol: 0.3,
+      geow: 10,
+      geoh: 3.5,
+      x: 0,
+      y: -1,
+      z: 0
+    }];
+    var material = new MeshPhongMaterial({
+      color: 0xffffff,
+      flatShading: true
+    });
+    material.lights = true;
+    var group = new Group();
+    arr.forEach(function (item) {
+      var geow = item.geow,
+          geol = item.geol,
+          geoh = item.geoh,
+          x = item.x,
+          y = item.y,
+          z = item.z;
+      var topgeometry = new BoxGeometry(geow, geoh, geol);
+      var top = new Mesh(topgeometry, material);
+      top.position.set(x, y, z);
+      top.receiveShadow = true;
+      top.castShadow = true;
+      group.add(top);
+    });
+    scene.add(group);
+  };
+
+  var createTextur = function createTextur(scene) {
+    var loader = new TextureLoader();
+    loader.load('/show.png', function (texture) {
+      var material = new MeshBasicMaterial({
+        map: texture
+      });
+      var quad = new PlaneBufferGeometry(10, 3.5);
+      var mesh = new Mesh(quad, material);
+      mesh.position.set(0, 3, 0);
+      scene.add(mesh);
+    });
+  };
+
+  var createFont = function createFont(scene) {
+    var loader = new FontLoader();
+    var fonts = [{
+      text: 'logo',
+      x: -5,
+      y: 4.9,
+      z: 0.2
+    }, {
+      text: '主页',
+      x: -3,
+      y: 4.9,
+      z: 0.2
+    }, {
+      text: '团队介绍',
+      x: -1,
+      y: 4.9,
+      z: 0.2
+    }, {
+      text: '加入我们',
+      x: 2,
+      y: 4.9,
+      z: 0.2
+    }, //tab
+    {
+      text: '图像技术',
+      x: -4,
+      y: 1,
+      z: 0.2
+    }, {
+      text: '文字识别',
+      x: -2,
+      y: 1,
+      z: 0.2
+    }, {
+      text: '车辆分析',
+      x: 0,
+      y: 1,
+      z: 0.2
+    }, {
+      text: '人脸识别',
+      x: 2,
+      y: 1,
+      z: 0.2
+    }, {
+      text: '视频技术',
+      x: 4,
+      y: 1,
+      z: 0.2
+    }, //other
+    {
+      text: '文字识别',
+      x: -4,
+      y: 0,
+      z: 0.2
+    }, {
+      text: '支持多场景、高精度的文字检测与识别服务，广泛应用于发票、火车票以及身份证等文字识别。',
+      x: -4,
+      y: -0.5,
+      z: 0.2
+    }, {
+      text: '产品优势',
+      x: -4,
+      y: -1,
+      z: 0.2
+    }, {
+      text: '支持多语言、多尺度、多方向以及多场景中的文字识别；利用深度学习技术及精确算法不断优化训练模型，准确率高达99% ；标准化接口，',
+      x: -4,
+      y: -1.5,
+      z: 0.2
+    }, {
+      text: '上传图片即可获得结果，使服务更加便捷。',
+      x: -4,
+      y: -1.8,
+      z: 0.2
+    }, {
+      text: '产品功能',
+      x: 0,
+      y: -2.5,
+      z: 0.2
+    }];
+    loader.load('/test.json', function (font) {
+      var color = new Color(0x006699);
+      var matLite = new MeshBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.8,
+        side: DoubleSide,
+        x: 50
+      });
+      fonts.forEach(function (item) {
+        var geometry = new TextGeometry(item.text, {
+          font: font,
+          size: 0.1,
+          height: 0.08,
+          curveSegments: 12,
+          bevelEnabled: false,
+          bevelThickness: 10,
+          bevelSize: 8,
+          bevelSegments: 5
+        });
+        geometry.computeBoundingBox();
+        geometry.translate(item.x, item.y, item.z);
+        var text = new Mesh(geometry, matLite);
+        scene.add(text);
+      });
+    }); //end load function
+  };
+
+  var createTool = function createTool(scene, camera, renderer) {
+    //controls
     var controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 1, 0);
     controls.update(); // GUI
@@ -48839,51 +49535,17 @@
     sceneFolder.add(scene.position, "z", 0, 100, 0.01);
     sceneFolder.add(scene.position, "x", 0, 100, 0.01);
     sceneFolder.add(scene.position, "y", 0, 100, 0.01);
+  };
+
+  var init = function init(scene, camera, renderer, dirLight) {
 
     function animate() {
-      requestAnimationFrame(animate);
+      requestAnimationFrame(animate); // dirLight.position.set( x,0, 3 );
+
       renderer.render(scene, camera);
     }
 
     animate();
-  };
-
-  var creat = function creat() {
-    //w width
-    //l long
-    //h height
-    var box1 = {
-      geol: 1,
-      geow: 1,
-      geoh: 0.33,
-      x: -4.5,
-      y: 0.1,
-      z: -4.5
-    };
-    var box2 = {
-      geol: 2,
-      geow: 2,
-      geoh: 0.33,
-      x: 0,
-      y: 0.1,
-      z: -4.5
-    };
-    var arr = [box1, box2];
-    var material = new MeshNormalMaterial();
-    var group = new Group();
-    arr.forEach(function (item) {
-      var geow = item.geow,
-          geol = item.geol,
-          geoh = item.geoh,
-          x = item.x,
-          y = item.y,
-          z = item.z;
-      var topgeometry = new BoxGeometry(geow, geoh, geol);
-      var top = new Mesh(topgeometry, material);
-      top.position.set(x, y, z);
-      group.add(top);
-    });
-    return group;
   };
 
   /**
