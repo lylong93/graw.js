@@ -15,11 +15,7 @@ export default {
     output: {
         file: 'bundle.js',
         format: 'umd',
-        // globals: {
-        //   lodash: 'lodash',
-        //   // THREE: 'THREE'
-        // }
-        // sourcemap: true
+        name: 'Gws',
       },
       plugins: [
         resolve(),
